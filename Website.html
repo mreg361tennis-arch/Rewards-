@@ -1,0 +1,1671 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Reward System Tracker</title>  
+    <style>  
+        * {  
+            margin: 0;  
+            padding: 0;  
+            box-sizing: border-box;  
+        }  
+          
+        body {  
+            font-family: Arial, sans-serif;  
+            padding: 20px;  
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);  
+            min-height: 100vh;  
+        }  
+          
+        body.mobile-view {  
+            padding: 10px;  
+        }  
+          
+        body.mobile-view .container {  
+            padding: 15px;  
+        }  
+          
+        body.mobile-view h1 {  
+            font-size: 1.8em;  
+        }  
+          
+        body.mobile-view .balance {  
+            font-size: 1.5em;  
+            padding: 15px;  
+        }  
+          
+        body.mobile-view .section-title {  
+            font-size: 1.3em;  
+        }  
+          
+        body.mobile-view .section {  
+            padding: 15px;  
+        }  
+          
+        .container {  
+            max-width: 1000px;  
+            margin: 0 auto;  
+            background: white;  
+            padding: 30px;  
+            border-radius: 15px;  
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);  
+        }  
+          
+        h1 {  
+            text-align: center;  
+            color: #667eea;  
+            margin-bottom: 30px;  
+            font-size: 2.5em;  
+            text-transform: uppercase;  
+            letter-spacing: 2px;  
+        }  
+          
+        .balance {  
+            text-align: center;  
+            font-size: 2em;  
+            margin-bottom: 40px;  
+            padding: 20px;  
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);  
+            color: white;  
+            border-radius: 10px;  
+            font-weight: bold;  
+            position: relative;  
+        }  
+          
+        .balance-display {  
+            cursor: pointer;  
+            transition: transform 0.2s;  
+        }  
+          
+        .balance-display:hover {  
+            transform: scale(1.05);  
+        }  
+          
+        .balance-input {  
+            font-size: 1em;  
+            padding: 10px;  
+            width: 150px;  
+            border: 3px solid white;  
+            border-radius: 5px;  
+            text-align: center;  
+            font-weight: bold;  
+        }  
+          
+        .balance-edit-btn {  
+            background: white;  
+            color: #667eea;  
+            padding: 8px 15px;  
+            margin-left: 10px;  
+            font-size: 0.5em;  
+            border-radius: 5px;  
+            cursor: pointer;  
+            border: none;  
+            font-weight: bold;  
+        }  
+          
+        .section {  
+            margin-bottom: 35px;  
+            padding: 25px;  
+            border: 3px solid #667eea;  
+            border-radius: 10px;  
+            background: #f8f9ff;  
+        }  
+          
+        .section-title {  
+            font-size: 1.8em;  
+            font-weight: bold;  
+            color: #667eea;  
+            margin-bottom: 15px;  
+            text-transform: uppercase;  
+            border-bottom: 3px solid #764ba2;  
+            padding-bottom: 10px;  
+        }  
+          
+        .reward-item {  
+            margin: 12px 0;  
+            padding: 10px;  
+            background: white;  
+            border-radius: 5px;  
+            border-left: 4px solid #764ba2;  
+        }  
+          
+        .reward-level {  
+            font-weight: bold;  
+            color: #333;  
+            margin: 5px 0;  
+        }  
+          
+        .checklist {  
+            margin-top: 15px;  
+        }  
+          
+        .checkbox-item {  
+            display: flex;  
+            align-items: center;  
+            padding: 10px;  
+            margin: 8px 0;  
+            background: white;  
+            border-radius: 5px;  
+            border-left: 4px solid #51cf66;  
+        }  
+          
+        .checkbox-item input[type="checkbox"] {  
+            width: 20px;  
+            height: 20px;  
+            margin-right: 15px;  
+            cursor: pointer;  
+        }  
+          
+        .checkbox-item label {  
+            font-size: 1.1em;  
+            cursor: pointer;  
+            flex-grow: 1;  
+        }  
+          
+        .checkbox-item input[type="checkbox"]:checked + label {  
+            text-decoration: line-through;  
+            color: #999;  
+        }  
+          
+        .btn {  
+            padding: 12px 25px;  
+            font-size: 1em;  
+            border: none;  
+            border-radius: 5px;  
+            cursor: pointer;  
+            font-weight: bold;  
+            transition: transform 0.2s;  
+        }  
+          
+        .btn:hover {  
+            transform: scale(1.05);  
+        }  
+          
+        .btn-reset {  
+            background: #ffc107;  
+            color: white;  
+            width: 100%;  
+            margin-top: 15px;  
+        }  
+          
+        .btn-add {  
+            background: #51cf66;  
+            color: white;  
+            margin-right: 10px;  
+        }  
+          
+        .btn-delete {  
+            background: #ff6b6b;  
+            color: white;  
+            padding: 8px 15px;  
+            font-size: 0.9em;  
+        }  
+          
+        .btn-toggle {  
+            background: #667eea;  
+            color: white;  
+            position: fixed;  
+            bottom: 20px;  
+            right: 20px;  
+            padding: 15px 20px;  
+            border-radius: 50px;  
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);  
+            z-index: 1000;  
+        }  
+          
+        /* Star Rating Styles */  
+        .star-rating-day {  
+            background: white;  
+            padding: 15px;  
+            margin: 10px 0;  
+            border-radius: 5px;  
+            border-left: 4px solid #667eea;  
+        }  
+          
+        .star-rating-day-title {  
+            font-weight: bold;  
+            color: #667eea;  
+            margin-bottom: 10px;  
+            font-size: 1.1em;  
+        }  
+          
+        .star-rating-group {  
+            margin: 10px 0;  
+        }  
+          
+        .star-rating-label {  
+            font-size: 0.9em;  
+            color: #666;  
+            margin-bottom: 5px;  
+            display: block;  
+        }  
+          
+        .star-rating {  
+            display: inline-flex;  
+            flex-direction: row-reverse;  
+            gap: 5px;  
+        }  
+          
+        .star-rating input[type="radio"] {  
+            display: none;  
+        }  
+          
+        .star-rating label {  
+            cursor: pointer;  
+            font-size: 30px;  
+            color: #ddd;  
+            transition: color 0.2s;  
+            line-height: 1; /* Ensure stars align vertically */  
+        }  
+          
+        /* Fixed Star for Edge: Use standard unicode star instead of FontAwesome */  
+        .star-rating label:before {  
+            content: "★";  
+            /* Removed font-family dependency to fix Edge issues */  
+        }  
+          
+        .star-rating input[type="radio"]:checked ~ label {  
+            color: #FFC107;  
+        }  
+          
+        .star-rating label:hover,  
+        .star-rating label:hover ~ label {  
+            color: #ffdb70;  
+        }  
+          
+        .rating-average {  
+            display: inline-block;  
+            margin-left: 20px;  
+            font-weight: bold;  
+            padding: 5px 15px;  
+            border-radius: 5px;  
+            background: #f0f0f0;  
+        }  
+          
+        .rating-average.high {  
+            background: #d3f9d8;  
+            color: #2f9e44;  
+        }  
+          
+        .rating-average.low {  
+            background: #ffe3e3;  
+            color: #c92a2a;  
+        }  
+          
+        /* Piano/Running Tracker Styles */  
+        .piano-day {  
+            background: white;  
+            padding: 10px 15px;  
+            margin: 8px 0;  
+            border-radius: 5px;  
+            border-left: 4px solid #667eea;  
+            display: flex;  
+            align-items: center;  
+            flex-wrap: wrap; /* Fix for mobile */  
+            gap: 15px;  
+        }  
+          
+        .piano-day-label {  
+            font-weight: bold;  
+            color: #667eea;  
+            min-width: 100px;  
+        }  
+          
+        .piano-input {  
+            padding: 8px;  
+            border: 2px solid #667eea;  
+            border-radius: 5px;  
+            width: 100px;  
+            font-size: 1em;  
+        }  
+          
+        .piano-unit {  
+             white-space: nowrap;  
+        }  
+          
+        .piano-calculator {  
+            background: white;  
+            padding: 20px;  
+            border-radius: 10px;  
+            border: 3px solid #51cf66;  
+            margin-top: 15px;  
+            text-align: center;  
+        }  
+          
+        .piano-total {  
+            font-size: 3em;  
+            font-weight: bold;  
+            color: #51cf66;  
+            margin: 20px 0;  
+        }  
+          
+        .updates-section {  
+            background: #fff3cd;  
+            border-color: #ffc107;  
+        }  
+          
+        .updates-section .section-title {  
+            color: #ff6b6b;  
+            border-bottom-color: #ffc107;  
+        }  
+          
+        #updatesList {  
+            list-style: none;  
+        }  
+          
+        .update-item {  
+            background: white;  
+            padding: 12px;  
+            margin: 10px 0;  
+            border-radius: 5px;  
+            border-left: 4px solid #ffc107;  
+            display: flex;  
+            justify-content: space-between;  
+            align-items: center;  
+        }  
+          
+        .update-input {  
+            width: 100%;  
+            padding: 12px;  
+            font-size: 1em;  
+            border: 2px solid #667eea;  
+            border-radius: 5px;  
+            margin-bottom: 10px;  
+        }  
+          
+        .data-sync-buttons {  
+            display: flex;  
+            gap: 10px;  
+            margin-top: 20px;  
+            flex-wrap: wrap;  
+        }  
+          
+        .btn-export {  
+            background: #51cf66;  
+            color: white;  
+            flex: 1;  
+            min-width: 150px;  
+        }  
+          
+        .btn-import {  
+            background: #4dabf7;  
+            color: white;  
+            flex: 1;  
+            min-width: 150px;  
+        }  
+          
+        #importFile {  
+            display: none;  
+        }  
+          
+        .modal-overlay {  
+            display: none;  
+            position: fixed;  
+            top: 0;  
+            left: 0;  
+            width: 100%;  
+            height: 100%;  
+            background: rgba(0, 0, 0, 0.6);  
+            backdrop-filter: blur(5px);  
+            z-index: 2000;  
+            justify-content: center;  
+            align-items: center;  
+        }  
+          
+        .modal-overlay.active {  
+            display: flex;  
+        }  
+          
+        .modal-content {  
+            background: white;  
+            padding: 30px;  
+            border-radius: 15px;  
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);  
+            max-width: 400px;  
+            width: 90%;  
+            text-align: center;  
+        }  
+          
+        .modal-title {  
+            font-size: 1.5em;  
+            font-weight: bold;  
+            color: #667eea;  
+            margin-bottom: 15px;  
+        }  
+          
+        .modal-message {  
+            font-size: 1.1em;  
+            color: #333;  
+            margin-bottom: 25px;  
+            line-height: 1.5;  
+        }  
+          
+        .modal-buttons {  
+            display: flex;  
+            justify-content: flex-end;  
+            gap: 10px;  
+        }  
+          
+        .modal-btn {  
+            padding: 12px 25px;  
+            font-size: 1em;  
+            border: none;  
+            border-radius: 5px;  
+            cursor: pointer;  
+            font-weight: bold;  
+            transition: transform 0.2s;  
+        }  
+          
+        .modal-btn:hover {  
+            transform: scale(1.05);  
+        }  
+          
+        .modal-btn-ok {  
+            background: #51cf66;  
+            color: white;  
+        }  
+          
+        .modal-btn-error {  
+            background: #ff6b6b;  
+            color: white;  
+        }  
+
+        .projected-earnings {
+            margin-top: 15px;
+            padding: 12px 18px;
+            background: linear-gradient(135deg, #f0fff4, #e6ffed);
+            border: 2px solid #51cf66;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #2f9e44;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .projected-earnings .proj-label {
+            color: #555;
+            font-weight: normal;
+        }
+
+        .projected-earnings .proj-amount {
+            font-size: 1.3em;
+            color: #2f9e44;
+        }
+
+        .projected-earnings .proj-note {
+            font-size: 0.85em;
+            color: #777;
+            font-weight: normal;
+            margin-left: auto;
+        }
+
+        .projected-earnings.zero {
+            background: #f8f9ff;
+            border-color: #ccc;
+            color: #999;
+        }
+
+        .projected-earnings.zero .proj-amount {
+            color: #999;
+        }
+
+        .btn-add-projected {
+            background: linear-gradient(135deg, #51cf66, #2f9e44);
+            color: white;
+            width: 100%;
+            margin-top: 30px;
+            padding: 18px;
+            font-size: 1.2em;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(81, 207, 102, 0.4);
+        }
+
+        .btn-add-projected:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(81, 207, 102, 0.5);
+        }
+
+        .total-projected-bar {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 18px 25px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 1.4em;
+            font-weight: bold;
+        }
+
+        .total-projected-bar .total-label {
+            font-size: 0.65em;
+            opacity: 0.85;
+            display: block;
+            margin-bottom: 4px;
+            font-weight: normal;
+        }
+
+        .drive-status-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.85em;
+            font-weight: bold;
+            z-index: 999;
+            transition: background 0.3s;
+        }
+        .drive-status-bar.idle    { background: #2f9e44; color: white; }
+        .drive-status-bar.saving  { background: #e67700; color: white; }
+        .drive-status-bar.error   { background: #c92a2a; color: white; }
+        .drive-status-bar.offline { background: #555;    color: #ccc; }
+        body { padding-bottom: 40px; }
+    </style>  
+</head>  
+<body>  
+    <div class="container">  
+        <h1>🎯 System Reward Tracker</h1>  
+          
+        <div class="balance">  
+            <span id="balanceDisplay" class="balance-display" onclick="editBalance()">  
+                You Have: $<span id="currentBalance">0</span>  
+            </span>  
+            <div id="balanceEdit" style="display: none;">  
+                You Have: $<input type="number" id="balanceInput" class="balance-input" value="0">  
+                <button class="balance-edit-btn" onclick="saveBalance()">Save</button>  
+                <button class="balance-edit-btn" onclick="cancelBalanceEdit()">Cancel</button>  
+            </div>  
+        </div>  
+          
+        <div class="section">  
+            <div class="section-title">💤 SLEEP Before 10</div>  
+            <div class="reward-item">  
+                <div class="reward-level">5 out of 7 days → $6</div>  
+                <div class="reward-level">6 out of 7 days → $8</div>  
+                <div class="reward-level">Perfect (7/7) → $10</div>  
+            </div>  
+              
+            <div class="checklist">  
+                <h3 style="color: #667eea; margin-bottom: 10px;">Weekly Sleep Tracker:</h3>  
+                <div class="checkbox-item">  
+                    <input type="checkbox" id="sleep1" onchange="saveSleepCheckboxes(); updateProjectedEarnings();">  
+                    <label for="sleep1">Monday</label>  
+                </div>  
+                <div class="checkbox-item">  
+                    <input type="checkbox" id="sleep2" onchange="saveSleepCheckboxes(); updateProjectedEarnings();">  
+                    <label for="sleep2">Tuesday</label>  
+                </div>  
+                <div class="checkbox-item">  
+                    <input type="checkbox" id="sleep3" onchange="saveSleepCheckboxes(); updateProjectedEarnings();">  
+                    <label for="sleep3">Wednesday</label>  
+                </div>  
+                <div class="checkbox-item">  
+                    <input type="checkbox" id="sleep4" onchange="saveSleepCheckboxes(); updateProjectedEarnings();">  
+                    <label for="sleep4">Thursday</label>  
+                </div>  
+                <div class="checkbox-item">  
+                    <input type="checkbox" id="sleep5" onchange="saveSleepCheckboxes(); updateProjectedEarnings();">  
+                    <label for="sleep5">Friday</label>  
+                </div>  
+                <div class="checkbox-item">  
+                    <input type="checkbox" id="sleep6" onchange="saveSleepCheckboxes(); updateProjectedEarnings();">  
+                    <label for="sleep6">Saturday</label>  
+                </div>  
+                <div class="checkbox-item">  
+                    <input type="checkbox" id="sleep7" onchange="saveSleepCheckboxes(); updateProjectedEarnings();">  
+                    <label for="sleep7">Sunday</label>  
+                </div>  
+                <button class="btn btn-reset" onclick="resetSleepCheckboxes(); return false;">🔄 Reset Sleep Tracker</button>  
+            </div>  
+            <div class="projected-earnings zero" id="proj-sleep">
+                <span class="proj-label">Earnings:</span>
+                <span class="proj-amount" id="proj-sleep-amount">$0</span>
+                <span class="proj-note" id="proj-sleep-note">Check more days to earn</span>
+            </div>
+        </div>  
+          
+        <div class="section">  
+            <div class="section-title">🏃 LEAVE 50 Min Before School / Get Ready 30 Min After</div>  
+            <div class="reward-item">  
+                <div class="reward-level">5 out of 7 days → $6</div>  
+                <div class="reward-level">6 out of 7 days → $8</div>  
+                <div class="reward-level">Perfect (7/7) → $10</div>  
+            </div>  
+              
+            <div class="checklist">  
+                <h3 style="color: #667eea; margin-bottom: 10px;">Weekly On-Time Tracker:</h3>  
+                <div class="checkbox-item">  
+                    <input type="checkbox" id="ontime1" onchange="saveOntimeCheckboxes(); updateProjectedEarnings();">  
+                    <label for="ontime1">Monday</label>  
+                </div>  
+                <div class="checkbox-item">  
+                    <input type="checkbox" id="ontime2" onchange="saveOntimeCheckboxes(); updateProjectedEarnings();">  
+                    <label for="ontime2">Tuesday</label>  
+                </div>  
+                <div class="checkbox-item">  
+                    <input type="checkbox" id="ontime3" onchange="saveOntimeCheckboxes(); updateProjectedEarnings();">  
+                    <label for="ontime3">Wednesday</label>  
+                </div>  
+                <div class="checkbox-item">  
+                    <input type="checkbox" id="ontime4" onchange="saveOntimeCheckboxes(); updateProjectedEarnings();">  
+                    <label for="ontime4">Thursday</label>  
+                </div>  
+                <div class="checkbox-item">  
+                    <input type="checkbox" id="ontime5" onchange="saveOntimeCheckboxes(); updateProjectedEarnings();">  
+                    <label for="ontime5">Friday</label>  
+                </div>  
+                <div class="checkbox-item">  
+                    <input type="checkbox" id="ontime6" onchange="saveOntimeCheckboxes(); updateProjectedEarnings();">  
+                    <label for="ontime6">Saturday</label>  
+                </div>  
+                <div class="checkbox-item">  
+                    <input type="checkbox" id="ontime7" onchange="saveOntimeCheckboxes(); updateProjectedEarnings();">  
+                    <label for="ontime7">Sunday</label>  
+                </div>  
+                <button class="btn btn-reset" onclick="resetOntimeCheckboxes(); return false;">🔄 Reset On-Time Tracker</button>  
+            </div>  
+            <div class="projected-earnings zero" id="proj-ontime">
+                <span class="proj-label">Earnings:</span>
+                <span class="proj-amount" id="proj-ontime-amount">$0</span>
+                <span class="proj-note" id="proj-ontime-note">Check more days to earn</span>
+            </div>
+        </div>  
+          
+        <div class="section">  
+            <div class="section-title">💪 SHOULDER Exercises</div>  
+            <div class="reward-item">  
+                <div class="reward-level">5 days basic + 3 days IYT + 2 days range of motion</div>  
+                <div class="reward-level">(Missing 1 basic OR 1 IYT OR 1 range of motion = normal pay)</div>  
+                <div class="reward-level">Normal → $7</div>  
+                <div class="reward-level">Perfect → $10</div>  
+            </div>  
+              
+            <div class="checklist">  
+                <h3 style="color: #667eea; margin-bottom: 10px;">Weekly Exercise Tracker:</h3>  
+                  
+                <div style="font-weight: bold; margin: 15px 0; color: #764ba2;">Basic Exercises (5 days needed):</div>  
+                <div class="checkbox-item">  
+                    <input type="checkbox" id="basic1" onchange="saveCheckboxes(); updateProjectedEarnings();">  
+                    <label for="basic1">Day 1 - Basic</label>  
+                </div>  
+                <div class="checkbox-item">  
+                    <input type="checkbox" id="basic2" onchange="saveCheckboxes(); updateProjectedEarnings();">  
+                    <label for="basic2">Day 2 - Basic</label>  
+                </div>  
+                <div class="checkbox-item">  
+                    <input type="checkbox" id="basic3" onchange="saveCheckboxes(); updateProjectedEarnings();">  
+                    <label for="basic3">Day 3 - Basic</label>  
+                </div>  
+                <div class="checkbox-item">  
+                    <input type="checkbox" id="basic4" onchange="saveCheckboxes(); updateProjectedEarnings();">  
+                    <label for="basic4">Day 4 - Basic</label>  
+                </div>  
+                <div class="checkbox-item">  
+                    <input type="checkbox" id="basic5" onchange="saveCheckboxes(); updateProjectedEarnings();">  
+                    <label for="basic5">Day 5 - Basic</label>  
+                </div>  
+                  
+                <div style="font-weight: bold; margin: 15px 0; color: #764ba2;">IYT Exercises (3 days needed):</div>  
+                <div class="checkbox-item">  
+                    <input type="checkbox" id="iyt1" onchange="saveCheckboxes(); updateProjectedEarnings();">  
+                    <label for="iyt1">Day 1 - IYT</label>  
+                </div>  
+                <div class="checkbox-item">  
+                    <input type="checkbox" id="iyt2" onchange="saveCheckboxes(); updateProjectedEarnings();">  
+                    <label for="iyt2">Day 2 - IYT</label>  
+                </div>  
+                <div class="checkbox-item">  
+                    <input type="checkbox" id="iyt3" onchange="saveCheckboxes(); updateProjectedEarnings();">  
+                    <label for="iyt3">Day 3 - IYT</label>  
+                </div>  
+                  
+                <div style="font-weight: bold; margin: 15px 0; color: #764ba2;">Range of Motion (2 days needed):</div>  
+                <div class="checkbox-item">  
+                    <input type="checkbox" id="rom1" onchange="saveCheckboxes(); updateProjectedEarnings();">  
+                    <label for="rom1">Day 1 - Range of Motion</label>  
+                </div>  
+                <div class="checkbox-item">  
+                    <input type="checkbox" id="rom2" onchange="saveCheckboxes(); updateProjectedEarnings();">  
+                    <label for="rom2">Day 2 - Range of Motion</label>  
+                </div>  
+                  
+                <button class="btn btn-reset" onclick="resetCheckboxes(); return false;">🔄 Reset Exercise Tracker</button>  
+            </div>  
+            <div class="projected-earnings zero" id="proj-shoulder">
+                <span class="proj-label">Earnings:</span>
+                <span class="proj-amount" id="proj-shoulder-amount">$0</span>
+                <span class="proj-note" id="proj-shoulder-note">Complete exercises to earn</span>
+            </div>
+        </div>  
+          
+        <div class="section">  
+            <div class="section-title">🎹 PIANO Playing Goals</div>  
+            <div class="reward-item">  
+                <div style="margin-bottom: 10px; font-style: italic; color: #666;">  
+                    Note: Schene lesson counts as 2 hours, other lessons don't count  
+                </div>  
+                <div class="reward-level">10 hours → $13</div>  
+                <div class="reward-level">11 hours → $15</div>  
+                <div style="margin-top: 10px; font-style: italic; color: #666;">  
+                    Breaks after 15 minutes allowed, but not after 5/6 minutes  
+                </div>  
+            </div>  
+              
+            <div class="checklist">  
+                <h3 style="color: #667eea; margin-bottom: 10px;">Weekly Piano Tracker:</h3>  
+                  
+                <div class="piano-day">  
+                    <span class="piano-day-label">Monday:</span>  
+                    <input type="number" id="piano1" class="piano-input" min="0" step="0.5" placeholder="0" onchange="calculatePianoHours(); updateProjectedEarnings();">   
+                    <span class="piano-unit">hours</span>  
+                </div>  
+                <div class="piano-day">  
+                    <span class="piano-day-label">Tuesday:</span>  
+                    <input type="number" id="piano2" class="piano-input" min="0" step="0.5" placeholder="0" onchange="calculatePianoHours(); updateProjectedEarnings();">   
+                    <span class="piano-unit">hours</span>  
+                </div>  
+                <div class="piano-day">  
+                    <span class="piano-day-label">Wednesday:</span>  
+                    <input type="number" id="piano3" class="piano-input" min="0" step="0.5" placeholder="0" onchange="calculatePianoHours(); updateProjectedEarnings();">   
+                    <span class="piano-unit">hours</span>  
+                </div>  
+                <div class="piano-day">  
+                    <span class="piano-day-label">Thursday:</span>  
+                    <input type="number" id="piano4" class="piano-input" min="0" step="0.5" placeholder="0" onchange="calculatePianoHours(); updateProjectedEarnings();">   
+                    <span class="piano-unit">hours</span>  
+                </div>  
+                <div class="piano-day">  
+                    <span class="piano-day-label">Friday:</span>  
+                    <input type="number" id="piano5" class="piano-input" min="0" step="0.5" placeholder="0" onchange="calculatePianoHours(); updateProjectedEarnings();">   
+                    <span class="piano-unit">hours</span>  
+                </div>  
+                <div class="piano-day">  
+                    <span class="piano-day-label">Saturday:</span>  
+                    <input type="number" id="piano6" class="piano-input" min="0" step="0.5" placeholder="0" onchange="calculatePianoHours(); updateProjectedEarnings();">   
+                    <span class="piano-unit">hours</span>  
+                </div>  
+                <div class="piano-day">  
+                    <span class="piano-day-label">Sunday:</span>  
+                    <input type="number" id="piano7" class="piano-input" min="0" step="0.5" placeholder="0" onchange="calculatePianoHours(); updateProjectedEarnings();">   
+                    <span class="piano-unit">hours</span>  
+                </div>  
+                  
+                <div class="piano-calculator">  
+                    <h3 style="color: #667eea; text-align: center; margin-bottom: 10px;">📊 Weekly Total</h3>  
+                    <div class="piano-total" id="pianoTotal">0.0</div>  
+                    <div style="text-align: center; color: #666;">hours this week</div>  
+                </div>  
+                  
+                <button class="btn btn-reset" onclick="resetPianoHours(); return false;">🔄 Reset Piano Tracker</button>  
+            </div>  
+            <div class="projected-earnings zero" id="proj-piano">
+                <span class="proj-label">Earnings:</span>
+                <span class="proj-amount" id="proj-piano-amount">$0</span>
+                <span class="proj-note" id="proj-piano-note">Need 10+ hrs to earn</span>
+            </div>
+        </div>  
+  
+        <!-- NEW RUNNING SECTION -->  
+        <div class="section">  
+            <div class="section-title">🏃 Running (Stop at most once)</div>  
+            <div class="reward-item">  
+                <div class="reward-level">1 hr 30 min → $5</div>  
+                <div class="reward-level">2 hr → $8</div>  
+            </div>  
+              
+            <div class="checklist">  
+                <h3 style="color: #667eea; margin-bottom: 10px;">Weekly Running Tracker:</h3>  
+                  
+                <div class="piano-day">  
+                    <span class="piano-day-label">Monday:</span>  
+                    <input type="number" id="running1" class="piano-input" min="0" step="0.1" placeholder="0" onchange="calculateRunningHours(); updateProjectedEarnings();">   
+                    <span class="piano-unit">hours</span>  
+                </div>  
+                <div class="piano-day">  
+                    <span class="piano-day-label">Tuesday:</span>  
+                    <input type="number" id="running2" class="piano-input" min="0" step="0.1" placeholder="0" onchange="calculateRunningHours(); updateProjectedEarnings();">   
+                    <span class="piano-unit">hours</span>  
+                </div>  
+                <div class="piano-day">  
+                    <span class="piano-day-label">Wednesday:</span>  
+                    <input type="number" id="running3" class="piano-input" min="0" step="0.1" placeholder="0" onchange="calculateRunningHours(); updateProjectedEarnings();">   
+                    <span class="piano-unit">hours</span>  
+                </div>  
+                <div class="piano-day">  
+                    <span class="piano-day-label">Thursday:</span>  
+                    <input type="number" id="running4" class="piano-input" min="0" step="0.1" placeholder="0" onchange="calculateRunningHours(); updateProjectedEarnings();">   
+                    <span class="piano-unit">hours</span>  
+                </div>  
+                <div class="piano-day">  
+                    <span class="piano-day-label">Friday:</span>  
+                    <input type="number" id="running5" class="piano-input" min="0" step="0.1" placeholder="0" onchange="calculateRunningHours(); updateProjectedEarnings();">   
+                    <span class="piano-unit">hours</span>  
+                </div>  
+                <div class="piano-day">  
+                    <span class="piano-day-label">Saturday:</span>  
+                    <input type="number" id="running6" class="piano-input" min="0" step="0.1" placeholder="0" onchange="calculateRunningHours(); updateProjectedEarnings();">   
+                    <span class="piano-unit">hours</span>  
+                </div>  
+                <div class="piano-day">  
+                    <span class="piano-day-label">Sunday:</span>  
+                    <input type="number" id="running7" class="piano-input" min="0" step="0.1" placeholder="0" onchange="calculateRunningHours(); updateProjectedEarnings();">   
+                    <span class="piano-unit">hours</span>  
+                </div>  
+                  
+                <div class="piano-calculator">  
+                    <h3 style="color: #667eea; text-align: center; margin-bottom: 10px;">📊 Weekly Total</h3>  
+                    <div class="piano-total" id="runningTotal">0.0</div>  
+                    <div style="text-align: center; color: #666;">hours this week</div>  
+                </div>  
+                  
+                <button class="btn btn-reset" onclick="resetRunningHours(); return false;">🔄 Reset Running Tracker</button>  
+            </div>  
+            <div class="projected-earnings zero" id="proj-running">
+                <span class="proj-label">Earnings:</span>
+                <span class="proj-amount" id="proj-running-amount">$0</span>
+                <span class="proj-note" id="proj-running-note">Need 1.5+ hrs to earn</span>
+            </div>
+        </div>  
+          
+        
+        <div class="section">  
+            <div class="section-title">📚 CHECK In With Teachers</div>  
+            <div class="reward-item">  
+                <div class="reward-level">4 out of 5 teachers every 2 weeks → $11</div>  
+            </div>  
+        </div>  
+          
+        <div class="section">  
+            <div class="section-title">✅ FOLLOW Directions and Accept Suggestions</div>  
+            <div class="reward-item">  
+                <div style="margin-bottom: 15px; font-weight: bold; color: #764ba2;">  
+                    Daily Rating Scale:  
+                </div>  
+                <div style="margin-left: 20px; margin-bottom: 10px;">  
+                    <div>⭐⭐⭐⭐⭐ <strong>5</strong> = Accepts all suggestions and follows all directions</div>  
+                    <div>⭐⭐⭐⭐ <strong>4</strong> = About 90% of the time</div>  
+                    <div>⭐⭐⭐ <strong>3</strong> = About 80% of the time</div>  
+                    <div>⭐⭐ <strong>2</strong> = About 50% of the time</div>  
+                    <div>⭐ <strong>1</strong> = 20% or less</div>  
+                </div>  
+                <div style="margin-top: 15px;">  
+                    <div class="reward-level">5 days rated 4 or above → $10</div>  
+                    <div class="reward-level">6 days rated 4 or above → $13</div>  
+                    <div class="reward-level">7 days rated 4 or above → $16</div>  
+                </div>  
+            </div>  
+              
+            <div style="margin-top: 25px;">  
+                <h3 style="color: #667eea; margin-bottom: 15px;">Weekly Ratings Tracker:</h3>  
+                  
+                <div id="ratingsContainer"></div>  
+                  
+                <button class="btn btn-reset" onclick="clearRatings(); return false;">🔄 Clear All Ratings</button>  
+            </div>  
+            <div class="projected-earnings zero" id="proj-directions">
+                <span class="proj-label">Earnings:</span>
+                <span class="proj-amount" id="proj-directions-amount">$0</span>
+                <span class="proj-note" id="proj-directions-note">Need 5+ days at 4 stars to earn</span>
+            </div>
+        </div>  
+          
+        <div class="total-projected-bar">
+            <span class="total-label">TOTAL EARNINGS THIS WEEK</span>
+            $<span id="totalProjected">0</span>
+        </div>
+
+        <button class="btn btn-add-projected" onclick="addProjectedToBalance()">
+            ➕ Add Earnings to Balance
+        </button>
+
+        <div class="section updates-section">  
+            <div class="section-title">📢 UPDATES</div>  
+            <div style="margin-bottom: 15px; font-style: italic;">  
+                <strong>Note:</strong> Weeks start Monday  
+            </div>  
+              
+            <input type="text" id="newUpdate" class="update-input" placeholder="Add a new update...">  
+            <button class="btn btn-add" onclick="addUpdate()">➕ Add Update</button>  
+              
+            <ul id="updatesList"></ul>  
+              
+            <div class="data-sync-buttons">
+                <button class="btn btn-export" onclick="pushToCloud(true)" style="background: linear-gradient(135deg, #51cf66, #2f9e44); color: white;">☁️ Force Sync</button>
+            </div>
+        </div>  
+    </div>  
+      
+    <div class="drive-status-bar idle" id="driveStatus">
+        ☁️ <span id="driveStatusText">Connected to Google Drive</span>
+    </div>
+
+    <button class="btn btn-toggle" onclick="toggleView()" id="toggleBtn">📱 Mobile View</button>  
+      
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal()">  
+        <div class="modal-content" onclick="event.stopPropagation()">  
+            <div class="modal-title" id="modalTitle">Notice</div>  
+            <div class="modal-message" id="modalMessage">Message here</div>  
+            <div class="modal-buttons">  
+                <button class="modal-btn modal-btn-ok" id="modalBtn" onclick="closeModal()">OK</button>  
+            </div>  
+        </div>  
+    </div>  
+      
+    <script>  
+        // Custom Modal Functions - Matching Original System  
+        function showModal(title, message, isError = false) {  
+            document.getElementById('modalTitle').textContent = title;  
+            document.getElementById('modalMessage').textContent = message;  
+            const btn = document.getElementById('modalBtn');  
+              
+            if (isError) {  
+                btn.className = 'modal-btn modal-btn-error';  
+            } else {  
+                btn.className = 'modal-btn modal-btn-ok';  
+            }  
+              
+            document.getElementById('modalOverlay').classList.add('active');  
+            document.body.style.overflow = 'hidden';  
+        }  
+          
+        function closeModal() {  
+            document.getElementById('modalOverlay').classList.remove('active');  
+            document.body.style.overflow = 'auto';  
+        }  
+          
+        // ── JSONBin.io sync ──────────────────────────────────────────────────────
+        const BIN_ID  = '6a137440ee5a733b1213796e';
+        const API_KEY = '$2a$10$pRDnrzFydk5.dfcxLl.f..g/WhYkZIH/D4pcz823R6nocqtt58gCe';
+        const BIN_URL = 'https://api.jsonbin.io/v3/b/' + BIN_ID;
+
+        let cloudSaveTimer = null;
+        let isSeeding = false;
+
+        // Intercept every localStorage.setItem so any change auto-schedules a cloud save
+        const _origSet = localStorage.setItem.bind(localStorage);
+        localStorage.setItem = function(key, value) {
+            _origSet(key, value);
+            if (!isSeeding) scheduleCloudSave();
+        };
+
+        function setStatus(state, text) {
+            const bar   = document.getElementById('driveStatus');
+            const label = document.getElementById('driveStatusText');
+            if (!bar || !label) return;
+            bar.className = 'drive-status-bar ' + state;
+            label.textContent = text;
+        }
+
+        function scheduleCloudSave() {
+            setStatus('saving', 'Saving...');
+            clearTimeout(cloudSaveTimer);
+            cloudSaveTimer = setTimeout(() => pushToCloud(false), 1000);
+        }
+
+        function pushToCloud(manual) {
+            const state = {
+                balance:            localStorage.getItem('balance') || '0',
+                sleepCheckboxes:    localStorage.getItem('sleepCheckboxes') || '{}',
+                ontimeCheckboxes:   localStorage.getItem('ontimeCheckboxes') || '{}',
+                exerciseCheckboxes: localStorage.getItem('exerciseCheckboxes') || '{}',
+                pianoHours:         localStorage.getItem('pianoHours') || '{}',
+                runningHours:       localStorage.getItem('runningHours') || '{}',
+                ratings:            localStorage.getItem('ratings') || '{}',
+                updates:            localStorage.getItem('updates') || '[]',
+                viewMode:           localStorage.getItem('viewMode') || 'desktop',
+            };
+            fetch(BIN_URL, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': API_KEY
+                },
+                body: JSON.stringify(state)
+            })
+            .then(r => r.json())
+            .then(() => setStatus('idle', '✓ Saved'))
+            .catch(() => setStatus('error', '✗ Save failed — data kept locally'));
+        }
+
+        function loadFromCloud(callback) {
+            setStatus('saving', 'Loading...');
+            fetch(BIN_URL + '/latest', {
+                headers: { 'X-Master-Key': API_KEY }
+            })
+            .then(r => r.json())
+            .then(json => {
+                const data = json.record || {};
+                isSeeding = true;
+                if (data.balance !== undefined)  _origSet('balance', data.balance);
+                if (data.sleepCheckboxes)        _origSet('sleepCheckboxes', data.sleepCheckboxes);
+                if (data.ontimeCheckboxes)       _origSet('ontimeCheckboxes', data.ontimeCheckboxes);
+                if (data.exerciseCheckboxes)     _origSet('exerciseCheckboxes', data.exerciseCheckboxes);
+                if (data.pianoHours)             _origSet('pianoHours', data.pianoHours);
+                if (data.runningHours)           _origSet('runningHours', data.runningHours);
+                if (data.ratings)                _origSet('ratings', data.ratings);
+                if (data.updates)                _origSet('updates', data.updates);
+                if (data.viewMode)               _origSet('viewMode', data.viewMode);
+                isSeeding = false;
+                setStatus('idle', '✓ Loaded from cloud');
+                callback();
+            })
+            .catch(() => {
+                setStatus('error', 'Could not reach cloud — loaded local data');
+                callback();
+            });
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadFromCloud(() => {
+                loadBalance();
+                loadSleepCheckboxes();
+                loadOntimeCheckboxes();
+                loadCheckboxes();
+                loadClothingCheckboxes();
+                loadPianoHours();
+                loadRunningHours();
+                initializeRatings();
+                loadRatings();
+                loadUpdates();
+                loadViewPreference();
+                updateProjectedEarnings();
+            });
+        });
+
+        // Balance Management  
+        function editBalance() {  
+            document.getElementById('balanceDisplay').style.display = 'none';  
+            document.getElementById('balanceEdit').style.display = 'block';  
+            document.getElementById('balanceInput').value = document.getElementById('currentBalance').textContent;  
+            document.getElementById('balanceInput').focus();  
+        }  
+          
+        function saveBalance() {  
+            const newBalance = document.getElementById('balanceInput').value;  
+            if (newBalance !== '' && !isNaN(newBalance)) {  
+                document.getElementById('currentBalance').textContent = newBalance;  
+                localStorage.setItem('balance', newBalance);  
+                document.getElementById('balanceDisplay').style.display = 'block';  
+                document.getElementById('balanceEdit').style.display = 'none';  
+            } else {  
+                showModal('Error', 'Invalid number!', true);  
+            }  
+        }  
+          
+        function cancelBalanceEdit() {  
+            document.getElementById('balanceDisplay').style.display = 'block';  
+            document.getElementById('balanceEdit').style.display = 'none';  
+        }  
+          
+        function loadBalance() {  
+            const saved = localStorage.getItem('balance');  
+            if (saved) {  
+                document.getElementById('currentBalance').textContent = saved;  
+                document.getElementById('balanceInput').value = saved;  
+            } else {  
+                document.getElementById('currentBalance').textContent = '0';  
+                document.getElementById('balanceInput').value = '0';  
+                localStorage.setItem('balance', '0');  
+            }  
+        }  
+          
+        // Sleep Checkboxes  
+        function saveSleepCheckboxes() {  
+            const states = {};  
+            for (let i = 1; i <= 7; i++) {  
+                states['sleep' + i] = document.getElementById('sleep' + i).checked;  
+            }  
+            localStorage.setItem('sleepCheckboxes', JSON.stringify(states));  
+        }  
+          
+        function loadSleepCheckboxes() {  
+            const saved = localStorage.getItem('sleepCheckboxes');  
+            if (saved) {  
+                const states = JSON.parse(saved);  
+                Object.keys(states).forEach(id => {  
+                    const checkbox = document.getElementById(id);  
+                    if (checkbox) checkbox.checked = states[id];  
+                });  
+            }  
+        }  
+          
+        function resetSleepCheckboxes() {  
+            for (let i = 1; i <= 7; i++) {  
+                const checkbox = document.getElementById('sleep' + i);  
+                if (checkbox) {  
+                    checkbox.checked = false;  
+                }  
+            }  
+            saveSleepCheckboxes();  
+            updateProjectedEarnings();
+            showModal('Success', 'Sleep tracker has been reset!');  
+        }  
+          
+        // On-Time Checkboxes  
+        function saveOntimeCheckboxes() {  
+            const states = {};  
+            for (let i = 1; i <= 7; i++) {  
+                states['ontime' + i] = document.getElementById('ontime' + i).checked;  
+            }  
+            localStorage.setItem('ontimeCheckboxes', JSON.stringify(states));  
+        }  
+          
+        function loadOntimeCheckboxes() {  
+            const saved = localStorage.getItem('ontimeCheckboxes');  
+            if (saved) {  
+                const states = JSON.parse(saved);  
+                Object.keys(states).forEach(id => {  
+                    const checkbox = document.getElementById(id);  
+                    if (checkbox) checkbox.checked = states[id];  
+                });  
+            }  
+        }  
+          
+        function resetOntimeCheckboxes() {  
+            for (let i = 1; i <= 7; i++) {  
+                const checkbox = document.getElementById('ontime' + i);  
+                if (checkbox) {  
+                    checkbox.checked = false;  
+                }  
+            }  
+            saveOntimeCheckboxes();  
+            updateProjectedEarnings();
+            showModal('Success', 'On-time tracker has been reset!');  
+        }  
+          
+        // Shoulder Exercise Checkboxes - Original Format  
+        function saveCheckboxes() {  
+            const checkboxes = ['basic1', 'basic2', 'basic3', 'basic4', 'basic5',   
+                               'iyt1', 'iyt2', 'iyt3', 'rom1', 'rom2'];  
+            const states = {};  
+            checkboxes.forEach(id => {  
+                states[id] = document.getElementById(id).checked;  
+            });  
+            localStorage.setItem('exerciseCheckboxes', JSON.stringify(states));  
+        }  
+          
+        function loadCheckboxes() {  
+            const saved = localStorage.getItem('exerciseCheckboxes');  
+            if (saved) {  
+                const states = JSON.parse(saved);  
+                Object.keys(states).forEach(id => {  
+                    const checkbox = document.getElementById(id);  
+                    if (checkbox) checkbox.checked = states[id];  
+                });  
+            }  
+        }  
+          
+        function resetCheckboxes() {  
+            const checkboxes = ['basic1', 'basic2', 'basic3', 'basic4', 'basic5',   
+                               'iyt1', 'iyt2', 'iyt3', 'rom1', 'rom2'];  
+              
+            checkboxes.forEach(id => {  
+                const checkbox = document.getElementById(id);  
+                if (checkbox) {  
+                    checkbox.checked = false;  
+                }  
+            });  
+              
+            saveCheckboxes();  
+            updateProjectedEarnings();
+            showModal('Success', 'Weekly checklist has been reset!');  
+        }  
+  
+        // Clothing Checkboxes  
+        function saveClothingCheckboxes() {  
+            const states = {};  
+            for (let i = 1; i <= 7; i++) {  
+                states['clothing' + i] = document.getElementById('clothing' + i).checked;  
+            }  
+            localStorage.setItem('clothingCheckboxes', JSON.stringify(states));  
+        }  
+          
+        function loadClothingCheckboxes() {  
+            const saved = localStorage.getItem('clothingCheckboxes');  
+            if (saved) {  
+                const states = JSON.parse(saved);  
+                Object.keys(states).forEach(id => {  
+                    const checkbox = document.getElementById(id);  
+                    if (checkbox) checkbox.checked = states[id];  
+                });  
+            }  
+        }  
+          
+        function resetClothingCheckboxes() {  
+            for (let i = 1; i <= 7; i++) {  
+                const checkbox = document.getElementById('clothing' + i);  
+                if (checkbox) {  
+                    checkbox.checked = false;  
+                }  
+            }  
+            saveClothingCheckboxes();  
+            showModal('Success', 'Clothing tracker has been reset!');  
+        }  
+          
+        // Piano Hours Tracker  
+        function calculatePianoHours() {  
+            let total = 0;  
+            for (let i = 1; i <= 7; i++) {  
+                const input = document.getElementById('piano' + i);  
+                const value = parseFloat(input.value) || 0;  
+                total += value;  
+            }  
+              
+            document.getElementById('pianoTotal').textContent = total.toFixed(1);  
+              
+            // Save to localStorage  
+            const hours = {};  
+            for (let i = 1; i <= 7; i++) {  
+                hours['piano' + i] = document.getElementById('piano' + i).value;  
+            }  
+            localStorage.setItem('pianoHours', JSON.stringify(hours));  
+        }  
+          
+        function loadPianoHours() {  
+            const saved = localStorage.getItem('pianoHours');  
+            if (saved) {  
+                const hours = JSON.parse(saved);  
+                Object.keys(hours).forEach(id => {  
+                    const input = document.getElementById(id);  
+                    if (input) input.value = hours[id];  
+                });  
+                calculatePianoHours();  
+            }  
+        }  
+          
+        function resetPianoHours() {  
+            for (let i = 1; i <= 7; i++) {  
+                const input = document.getElementById('piano' + i);  
+                if (input) {  
+                    input.value = '';  
+                }  
+            }  
+            calculatePianoHours();
+            updateProjectedEarnings();
+            showModal('Success', 'Piano tracker has been reset!');  
+        }  
+  
+        // Running Hours Tracker (New)  
+        function calculateRunningHours() {  
+            let total = 0;  
+            for (let i = 1; i <= 7; i++) {  
+                const input = document.getElementById('running' + i);  
+                const value = parseFloat(input.value) || 0;  
+                total += value;  
+            }  
+              
+            document.getElementById('runningTotal').textContent = total.toFixed(1);  
+              
+            // Save to localStorage  
+            const hours = {};  
+            for (let i = 1; i <= 7; i++) {  
+                hours['running' + i] = document.getElementById('running' + i).value;  
+            }  
+            localStorage.setItem('runningHours', JSON.stringify(hours));  
+        }  
+          
+        function loadRunningHours() {  
+            const saved = localStorage.getItem('runningHours');  
+            if (saved) {  
+                const hours = JSON.parse(saved);  
+                Object.keys(hours).forEach(id => {  
+                    const input = document.getElementById(id);  
+                    if (input) input.value = hours[id];  
+                });  
+                calculateRunningHours();  
+            }  
+        }  
+          
+        function resetRunningHours() {  
+            for (let i = 1; i <= 7; i++) {  
+                const input = document.getElementById('running' + i);  
+                if (input) {  
+                    input.value = '';  
+                }  
+            }  
+            calculateRunningHours();
+            updateProjectedEarnings();
+            showModal('Success', 'Running tracker has been reset!');  
+        }  
+          
+        // Star Ratings System  
+        function initializeRatings() {
+            const container = document.getElementById('ratingsContainer');
+            if (!container) return;
+
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            container.innerHTML = '';
+
+            days.forEach((day, index) => {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'star-rating-day';
+
+                let html = `<div class="star-rating-day-title">${day}</div>`;
+
+                html += `<div class="star-rating-group">
+                    <span class="star-rating-label">Your Rating:</span>
+                    <div class="star-rating">`;
+                for (let i = 5; i >= 1; i--) {
+                    html += `<input type="radio" id="self-${index}-${i}" name="self-${index}" value="${i}">
+                    <label for="self-${index}-${i}"></label>`;
+                }
+                html += `</div></div>`;
+
+                html += `<div class="star-rating-group">
+                    <span class="star-rating-label">Mom/Dad Rating:</span>
+                    <div class="star-rating">`;
+                for (let i = 5; i >= 1; i--) {
+                    html += `<input type="radio" id="parent-${index}-${i}" name="parent-${index}" value="${i}">
+                    <label for="parent-${index}-${i}"></label>`;
+                }
+                html += `</div>
+                    <span class="rating-average" id="avg-${index}">Avg: -</span>
+                </div>`;
+
+                dayDiv.innerHTML = html;
+                container.appendChild(dayDiv);
+
+                // Attach listeners AFTER appending so elements exist in the DOM
+                ['self', 'parent'].forEach(type => {
+                    for (let starVal = 1; starVal <= 5; starVal++) {
+                        const input = document.getElementById(`${type}-${index}-${starVal}`);
+                        if (!input) continue;
+
+                        input.addEventListener('click', (function(t, idx, val) {
+                            return function() {
+                                const saved = JSON.parse(localStorage.getItem('ratings') || '{}');
+                                const dayData = saved[idx] || {};
+                                if (String(dayData[t]) === String(val)) {
+                                    this.checked = false;
+                                }
+                                saveRatings();
+                            };
+                        })(type, index, starVal));
+                    }
+                });
+            });
+        }
+
+        function saveRatings() {
+  
+            const ratings = {};  
+              
+            for (let i = 0; i < 7; i++) {  
+                const selfInputs = document.querySelectorAll(`input[name="self-${i}"]:checked`);  
+                const parentInputs = document.querySelectorAll(`input[name="parent-${i}"]:checked`);  
+                  
+                const selfRating = selfInputs.length > 0 ? selfInputs[0].value : '';  
+                const parentRating = parentInputs.length > 0 ? parentInputs[0].value : '';  
+                  
+                ratings[i] = { self: selfRating, parent: parentRating };  
+                  
+                // Update average display based on the newly constructed object  
+                const avgDiv = document.getElementById(`avg-${i}`);  
+                const r = ratings[i];  
+                if (r.self && r.parent) {  
+                    const avg = (parseFloat(r.self) + parseFloat(r.parent)) / 2;  
+                    avgDiv.textContent = `Avg: ${avg.toFixed(1)}`;  
+                    avgDiv.className = avg >= 4 ? 'rating-average high' : 'rating-average low';  
+                } else {  
+                    avgDiv.textContent = 'Avg: -';  
+                    avgDiv.className = 'rating-average';  
+                }  
+            }  
+              
+            localStorage.setItem('ratings', JSON.stringify(ratings));  
+            updateProjectedEarnings();
+        }  
+          
+        function loadRatings() {  
+            const saved = localStorage.getItem('ratings');  
+            if (saved) {  
+                const ratings = JSON.parse(saved);  
+                  
+                for (let i = 0; i < 7; i++) {  
+                    if (ratings[i]) {  
+                        if (ratings[i].self) {  
+                            const selfRadio = document.getElementById(`self-${i}-${ratings[i].self}`);  
+                            if (selfRadio) selfRadio.checked = true;  
+                        }  
+                        if (ratings[i].parent) {  
+                            const parentRadio = document.getElementById(`parent-${i}-${ratings[i].parent}`);  
+                            if (parentRadio) parentRadio.checked = true;  
+                        }  
+                    }  
+                }  
+                  
+                saveRatings(); // Recalc averages  
+            }  
+        }  
+          
+        function clearRatings() {  
+            for (let i = 0; i < 7; i++) {  
+                const selfInputs = document.querySelectorAll(`input[name="self-${i}"]`);  
+                const parentInputs = document.querySelectorAll(`input[name="parent-${i}"]`);  
+                  
+                selfInputs.forEach(input => input.checked = false);  
+                parentInputs.forEach(input => input.checked = false);  
+                  
+                const avgDiv = document.getElementById(`avg-${i}`);  
+                if (avgDiv) {  
+                    avgDiv.textContent = 'Avg: -';  
+                    avgDiv.className = 'rating-average';  
+                }  
+            }  
+              
+            localStorage.setItem('ratings', JSON.stringify({}));  
+            updateProjectedEarnings();
+            showModal('Success', 'All ratings have been cleared!');  
+        }  
+          
+        // Updates Management  
+        function addUpdate() {  
+            const input = document.getElementById('newUpdate');  
+            const text = input.value.trim();  
+              
+            if (text === '') {  
+                showModal('Error', 'Please enter an update!', true);  
+                return;  
+            }  
+              
+            const li = document.createElement('li');  
+            li.className = 'update-item';  
+            li.innerHTML = `<span>${text}</span><button class="btn btn-delete" onclick="deleteUpdate(this)">Delete</button>`;  
+              
+            document.getElementById('updatesList').appendChild(li);  
+            input.value = '';  
+            saveUpdates();  
+        }  
+          
+        function deleteUpdate(button) {  
+            button.parentElement.remove();  
+            saveUpdates();  
+        }  
+          
+        function saveUpdates() {  
+            const updates = [];  
+            document.querySelectorAll('.update-item span').forEach(span => {  
+                updates.push(span.textContent);  
+            });  
+            localStorage.setItem('updates', JSON.stringify(updates));  
+        }  
+          
+        function loadUpdates() {  
+            const saved = localStorage.getItem('updates');  
+            if (saved) {  
+                const updates = JSON.parse(saved);  
+                const list = document.getElementById('updatesList');  
+                list.innerHTML = '';  
+                  
+                updates.forEach(update => {  
+                    const li = document.createElement('li');  
+                    li.className = 'update-item';  
+                    li.innerHTML = `<span>${update}</span><button class="btn btn-delete" onclick="deleteUpdate(this)">Delete</button>`;  
+                    list.appendChild(li);  
+                });  
+            }  
+        }  
+          
+        // View Toggle  
+        function toggleView() {  
+            const body = document.body;  
+            const btn = document.getElementById('toggleBtn');  
+              
+            if (body.classList.contains('mobile-view')) {  
+                body.classList.remove('mobile-view');  
+                btn.textContent = '📱 Mobile View';  
+                localStorage.setItem('viewMode', 'desktop');  
+            } else {  
+                body.classList.add('mobile-view');  
+                btn.textContent = '💻 Desktop View';  
+                localStorage.setItem('viewMode', 'mobile');  
+            }  
+        }  
+          
+        function loadViewPreference() {  
+            const saved = localStorage.getItem('viewMode');  
+            if (saved === 'mobile') {  
+                document.body.classList.add('mobile-view');  
+                document.getElementById('toggleBtn').textContent = '💻 Desktop View';  
+            }  
+        }  
+          
+        // Export/Import  
+                // Projected Earnings Calculator
+        function updateProjectedEarnings() {
+
+            // Sleep
+            let sleepCount = 0;
+            for (let i = 1; i <= 7; i++) {
+                if (document.getElementById('sleep' + i) && document.getElementById('sleep' + i).checked) sleepCount++;
+            }
+            let sleepEarnings = 0;
+            let sleepNote = 'Need 5+ days to earn';
+            if (sleepCount === 7) { sleepEarnings = 10; sleepNote = 'Perfect week!'; }
+            else if (sleepCount === 6) { sleepEarnings = 8; sleepNote = '6/7 days'; }
+            else if (sleepCount >= 5) { sleepEarnings = 6; sleepNote = '5/7 days'; }
+            setProj('sleep', sleepEarnings, sleepNote);
+
+            // On-Time
+            let ontimeCount = 0;
+            for (let i = 1; i <= 7; i++) {
+                if (document.getElementById('ontime' + i) && document.getElementById('ontime' + i).checked) ontimeCount++;
+            }
+            let ontimeEarnings = 0;
+            let ontimeNote = 'Need 5+ days to earn';
+            if (ontimeCount === 7) { ontimeEarnings = 10; ontimeNote = 'Perfect week!'; }
+            else if (ontimeCount === 6) { ontimeEarnings = 8; ontimeNote = '6/7 days'; }
+            else if (ontimeCount >= 5) { ontimeEarnings = 6; ontimeNote = '5/7 days'; }
+            setProj('ontime', ontimeEarnings, ontimeNote);
+
+            // Shoulder
+            // Category 1: Basic (need 5). Category 2: IYT (need 3) + ROM (need 2).
+            // $10: perfect (all done). $7: miss at most 1 from each category. $0: otherwise.
+            let basicCount = 0, iytCount = 0, romCount = 0;
+            for (let i = 1; i <= 5; i++) { if (document.getElementById('basic' + i) && document.getElementById('basic' + i).checked) basicCount++; }
+            for (let i = 1; i <= 3; i++) { if (document.getElementById('iyt' + i) && document.getElementById('iyt' + i).checked) iytCount++; }
+            for (let i = 1; i <= 2; i++) { if (document.getElementById('rom' + i) && document.getElementById('rom' + i).checked) romCount++; }
+            const basicShort = Math.max(0, 5 - basicCount);
+            const iytRomShort = Math.max(0, 3 - iytCount) + Math.max(0, 2 - romCount);
+            let shoulderEarnings = 0;
+            let shoulderNote = 'Complete exercises to earn';
+            if (basicShort === 0 && iytRomShort === 0) { shoulderEarnings = 10; shoulderNote = 'Perfect! All exercises done'; }
+            else if (basicShort <= 1 && iytRomShort <= 1) { shoulderEarnings = 7; shoulderNote = 'Normal pay (1 missed per category)'; }
+            setProj('shoulder', shoulderEarnings, shoulderNote);
+
+            // Piano
+            let pianoTotal = 0;
+            for (let i = 1; i <= 7; i++) {
+                const v = parseFloat(document.getElementById('piano' + i) ? document.getElementById('piano' + i).value : 0) || 0;
+                pianoTotal += v;
+            }
+            let pianoEarnings = 0;
+            let pianoNote = 'Need 10+ hrs to earn';
+            if (pianoTotal >= 11) { pianoEarnings = 15; pianoNote = pianoTotal.toFixed(1) + ' hrs (11+ tier)'; }
+            else if (pianoTotal >= 10) { pianoEarnings = 13; pianoNote = pianoTotal.toFixed(1) + ' hrs (10+ tier)'; }
+            setProj('piano', pianoEarnings, pianoNote);
+
+            // Running
+            let runningTotal = 0;
+            for (let i = 1; i <= 7; i++) {
+                const v = parseFloat(document.getElementById('running' + i) ? document.getElementById('running' + i).value : 0) || 0;
+                runningTotal += v;
+            }
+            let runningEarnings = 0;
+            let runningNote = 'Need 1.5+ hrs to earn';
+            if (runningTotal >= 2.0) { runningEarnings = 8; runningNote = runningTotal.toFixed(1) + ' hrs (2hr tier)'; }
+            else if (runningTotal >= 1.5) { runningEarnings = 5; runningNote = runningTotal.toFixed(1) + ' hrs (1.5hr tier)'; }
+            setProj('running', runningEarnings, runningNote);
+
+            // Follow Directions (from star ratings)
+            let daysAbove4 = 0;
+            for (let i = 0; i < 7; i++) {
+                const selfInputs = document.querySelectorAll(`input[name="self-${i}"]:checked`);
+                const parentInputs = document.querySelectorAll(`input[name="parent-${i}"]:checked`);
+                if (selfInputs.length > 0 && parentInputs.length > 0) {
+                    const avg = (parseFloat(selfInputs[0].value) + parseFloat(parentInputs[0].value)) / 2;
+                    if (avg >= 4) daysAbove4++;
+                }
+            }
+            let directionsEarnings = 0;
+            let directionsNote = 'Need 5+ days at 4 stars';
+            if (daysAbove4 === 7) { directionsEarnings = 16; directionsNote = '7 days rated 4+'; }
+            else if (daysAbove4 === 6) { directionsEarnings = 13; directionsNote = '6 days rated 4+'; }
+            else if (daysAbove4 >= 5) { directionsEarnings = 10; directionsNote = '5 days rated 4+'; }
+            setProj('directions', directionsEarnings, directionsNote);
+
+            // Total (excluding teachers since it's manual)
+            const total = sleepEarnings + ontimeEarnings + shoulderEarnings + pianoEarnings + runningEarnings + directionsEarnings;
+            document.getElementById('totalProjected').textContent = total.toFixed(0);
+        }
+
+        function setProj(id, amount, note) {
+            const box = document.getElementById('proj-' + id);
+            const amountEl = document.getElementById('proj-' + id + '-amount');
+            const noteEl = document.getElementById('proj-' + id + '-note');
+            if (!box || !amountEl) return;
+            amountEl.textContent = '$' + amount;
+            if (noteEl) noteEl.textContent = note;
+            if (amount > 0) {
+                box.classList.remove('zero');
+            } else {
+                box.classList.add('zero');
+            }
+        }
+
+        function addProjectedToBalance() {
+            const projectedText = document.getElementById('totalProjected').textContent;
+            const projected = parseFloat(projectedText) || 0;
+            if (projected === 0) {
+                showModal('Notice', 'No projected earnings to add yet. Complete your tasks first!', true);
+                return;
+            }
+            const currentBalance = parseFloat(document.getElementById('currentBalance').textContent) || 0;
+            const newBalance = (currentBalance + projected).toFixed(2);
+            document.getElementById('currentBalance').textContent = newBalance;
+            document.getElementById('balanceInput').value = newBalance;
+            localStorage.setItem('balance', newBalance);
+            showModal('Success', 'Added $' + projected + ' in projected earnings to your balance! New balance: $' + newBalance);
+        }
+
+        // Enter key support  
+        document.getElementById('balanceInput').addEventListener('keypress', (e) => {  
+            if (e.key === 'Enter') saveBalance();  
+        });  
+          
+        document.getElementById('newUpdate').addEventListener('keypress', (e) => {  
+            if (e.key === 'Enter') addUpdate();  
+        });  
+    </script>  
+</body>  
+</html>  
